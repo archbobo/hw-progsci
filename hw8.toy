@@ -1,0 +1,128 @@
+program hw8
+// Input: Seed n and t/r and s 
+// Output:   
+// Remarks:  
+// -----------------------------------------------------------------------------
+
+Read the input 
+10: 81FF Read either 0 or R0 seed into R[1]
+11: 82FF Store n into R[2]
+12: 9200 Store n into mem[00]
+13: 7D01 Store 1 into R[D]
+14: 7370 Store 70 into R[3], as the pointer to First n words
+15: 7490 Store 90 into R[4], as the pointer to Second n words
+16: 75B0 Store B0 into R[5], as the pointer to Third n words
+17: 7E1C Store 1C into R[E], the halt
+18: D11B JUMP to line 1B if non zero
+19: C033 Zero, Link to Decrypting part
+1A: EE00 JUMP to halt, R[E], which is Line 1C
+1B: C01D non-zero, jump and Link to Encrypt part
+1C: 0000 halt
+
+Generate Number
+Write out
+
+// Encrypt
+// Input: First n word in the message
+// Output: number 0, n, n encrypted words. n words of the key
+
+Generate random secret key s of length n words
+1D: F958 JUMP to Generate Rand, store 58 into R[9]
+1E: 8200 load n from mem[00] into R[2] 
+1F: 1703 Load R[3] into R[7] set the input address
+20: F947 Jump and LINk // Save current pointer // Load first n words
+21: 8200 Load mem[00] again into R[1]
+22: C22C JUMP to 2C if n is zero, begin to write
+23: A703 Load mem[R[3]] into R[7] as the t[i]
+24: A804 Load mem[R[4]] into R[8] as the k[i]
+25: 4978 XOR R[7] and R[8] and store the result into R[9]
+26: B905 Store R[9] into mem[R[5]], where R[5] is the pointer to third word
+27: 133D Increase pointer to first n 1
+28: 144D Increase pointer to second n 1
+29: 155D Increase pointer to third n 1
+2A: 222D Decrease n by 1
+2B: C022 JUMP back to Line 22
+Set the address
+2C: 90FF output 0
+2D: 9CFF output n
+2E: 78B0 Set the address for the output encrpty
+2F: F950 JUMp and link to 50 write to the output
+30: 7890 Set the address for output key
+31: F950 JUMP and link to 50 write to the output
+32: C01C JUMP back to main, line 1C
+
+encrypt it and store it into mem
+output number 0
+
+output n 
+output n words // output n encrtpyed words of the message
+output n words // output n words of the key
+
+
+// Decrypting
+// Input: First n word in the message, second n word in the message
+// Output: number n, and n words of t
+33: 7770 Set address for first n 
+34: F947 Load first n words // Read the input again for following n word // Store it into mem
+35: 7790 Set address for second n
+36: F947 Load Second n words
+37: 8200 Load mem[00] again into R[1] // while n != 0
+38: C242 JUMP to 42 if n is zero, begin to write // decrypt it and store it into mem
+39: A703 Load mem[R[3]] into R[7] as the r[i]
+3A: A804 Load mem[R[4]] into R[8] as the k[i]
+3B: 4978 XOR R[7] and R[8] and store the result into R[9]
+3C: B905 Store R[9] into mem[R[5]], where R[5] is the pointer to the third word
+3D: 133D Increase pointer to first n 1
+3E: 144D Increase pointer to second n 1
+3F: 155D Increase pointer to third n 1
+40: 222D Decrease n by 1
+41: C038 JUMP back to Line 38
+42: 8C00 Load n back to R[C]
+43: 9CFF Print n // Set the address
+44: 78B0 Load address to R[8]
+45: F950 write to the output
+46: C01C JUMP back to main, line 1C
+output number n
+output n words of t
+
+// Read the input for n words
+// Use R[7] to store the input address, which is passed from outside
+47: 8200 Load mem[00] again into R[2] // where R[2] temporary store n
+48: C24E JUMP to line 4E which increses pc if n is zero, begin to write
+49: 8FFF Read into R[F]
+4A: BF07 Store input into target address
+4B: 177D Increase pointer to input R[7] plus 1
+4C: 222D Decrease n by 1
+4D: C048 JUMP back to line 48
+4E: 7490 Reassign R[4] to 90
+4F: E900 JUMP back to the previous state
+
+// output the n words
+50: 8200 Load mem[00] again into R[2]
+51: C257 JUMP to line 57 which increase pc if n is zero, begin to write
+52: AF08 Load data in mem[R[8]] into R[F]
+53: 9FFF Output R[F] 
+54: 188D Increase pointer to input R[8] plus 1
+55: 222D Decrease n by 1
+56: C051 JUMP back to line 51
+57: E900 JUMP back to the previous state
+
+// Generate The Random number
+58: 7B04 Store 4 into R[B]
+59: 8200 Load mem[00] agine into R[2]
+5A: 7490 Load 90, which is the start pointer of the second n words
+5B: 1610 Load R[1] into R[6] as a temporary R[seed]
+5C: C265 Jump to line 63, where 63 the the end of generate, if n equals to zero
+5D: 222D Decrease n by 1
+5E: 5C6B Left shift seed / previous number for R[B](4) bit, store it into R[7]
+5F: 1C6C plus one r with a shifted r
+60: 1CCD plus the result with 1
+61: 16C0 load result back to R[6]
+62: B604 write the result into memory
+63: 144D Increase pointer with 1
+64: C05C JUMP bakc to the previous state, line 5C
+65: 8C00 Load n back to R[C]
+66: E900 JUMP back to the linked address
+
+
+// Store it into mem
