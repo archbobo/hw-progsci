@@ -24,3 +24,4 @@ sandpile: Using Go to simulate sandpile senario
 
 spatial: Simulate a spatial game with Prisoner’s Dilemma theory.
 
+Please don't copy any part of my code for your assignments in CMU. You will get caught.
